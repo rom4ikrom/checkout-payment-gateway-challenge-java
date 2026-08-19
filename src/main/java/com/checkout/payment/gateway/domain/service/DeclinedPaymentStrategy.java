@@ -27,7 +27,7 @@ public class DeclinedPaymentStrategy implements PaymentStrategy {
         .id(paymentIdGenerator.nextId())
         .cardDetails(new CardDetails(request.cardNumber(), request.expiryDate(), request.cardCvv()))
         .status(PaymentStatus.DECLINED)
-        .amount(Money.of(request.currency(), BigDecimal.valueOf(request.amount(), 2)))
+        .amount(Money.ofMinor(request.currency(), request.amount()))
         .build();
 
   }

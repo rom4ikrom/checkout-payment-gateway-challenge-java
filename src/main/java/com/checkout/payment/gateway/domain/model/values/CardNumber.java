@@ -19,6 +19,11 @@ public class CardNumber extends NonBlankString {
     return new CardNumber(value);
   }
 
+  public CardNumberLastFour lastFour() {
+    String value = value();
+    return CardNumberLastFour.of(value.substring(value.length() - 4));
+  }
+
   @Override
   public String toString() {
     return "****";

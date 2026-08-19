@@ -1,16 +1,18 @@
 package com.checkout.payment.gateway.presentation.model;
 
-import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
 import lombok.Builder;
-import java.util.UUID;
+import lombok.NonNull;
 
 @Builder
 public record PostPaymentResponse(
-    UUID id,
-    PaymentStatus status,
+    @NonNull
+    String id,
+    @NonNull
+    String status,
     int cardNumberLastFour,
     int expiryMonth,
     int expiryYear,
+    @NonNull
     String currency,
     int amount
 ) {
