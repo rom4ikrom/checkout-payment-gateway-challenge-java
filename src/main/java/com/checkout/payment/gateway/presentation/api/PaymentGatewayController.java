@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.Locale;
 
 @RestController
 public class PaymentGatewayController {
@@ -43,16 +42,15 @@ public class PaymentGatewayController {
     return new ResponseEntity<>(from(payment), HttpStatus.CREATED);
   }
 
-  // TODO configure Jackson mapper for tiny types
   private PaymentResponse from(Payment payment) {
     CardDetails cardDetails = payment.cardDetails();
     return PaymentResponse.builder()
-        .id(payment.id().value())
-        .status(payment.status().name().toLowerCase(Locale.ROOT))
-        .cardNumberLastFour(Integer.parseInt(cardDetails.cardNumberLastFour().value()))
-        .expiryMonth(cardDetails.expiryDate().month().value())
-        .expiryYear(cardDetails.expiryDate().year().value())
-        .currency(payment.amount().getCurrencyUnit().getCode())
+        .id(payment.id())
+        .status(payment.status())
+        .cardNumberLastFour(cardDetails.cardNumberLastFour())
+        .expiryMonth(cardDetails.expiryDate().month())
+        .expiryYear(cardDetails.expiryDate().year())
+        .currency(payment.amount().getCurrencyUnit())
         .amount(payment.amount().getAmountMinorInt())
         .build();
   }

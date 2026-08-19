@@ -2,7 +2,7 @@ package com.checkout.payment.gateway.domain.model.values;
 
 import java.util.Objects;
 
-abstract class PositiveInteger {
+public abstract class PositiveInteger {
 
   private final int value;
 
