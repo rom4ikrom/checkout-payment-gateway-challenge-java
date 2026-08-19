@@ -1,5 +1,7 @@
-package com.checkout.payment.gateway.domain.model.payment;
+package com.checkout.payment.gateway.infrastructure.entity;
 
+import com.checkout.payment.gateway.domain.model.payment.CardDetails;
+import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
 import com.checkout.payment.gateway.domain.model.values.AuthorisationCode;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
 import jakarta.annotation.Nullable;
@@ -12,7 +14,7 @@ import org.joda.money.Money;
 
 @Value
 @Builder
-public class Payment {
+public class PaymentEntity {
 
   @NonNull
   PaymentId id;

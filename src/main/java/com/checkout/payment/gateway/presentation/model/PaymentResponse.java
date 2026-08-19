@@ -1,13 +1,11 @@
 package com.checkout.payment.gateway.presentation.model;
 
-import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
 import lombok.Builder;
-import java.util.UUID;
 
 @Builder
-public record GetPaymentResponse(
-    UUID id,
-    PaymentStatus status,
+public record PaymentResponse(
+    String id,
+    String status,
     int cardNumberLastFour,
     int expiryMonth,
     int expiryYear,

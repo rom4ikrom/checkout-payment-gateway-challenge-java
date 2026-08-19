@@ -29,4 +29,9 @@ class CardNumberTest {
     assertThat(CardNumber.of("4444333322221111").toString()).isEqualTo("****");
   }
 
+  @Test
+  void returnsLastFourDigits() {
+    assertThat(CardNumber.of("4444333322221234").lastFour()).isEqualTo(CardNumberLastFour.of("1234"));
+  }
+
 }
