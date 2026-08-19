@@ -2,7 +2,6 @@ package com.checkout.payment.gateway.domain.model.authorisation;
 
 import com.checkout.payment.gateway.domain.model.values.AuthorisationCode;
 import lombok.NonNull;
-import lombok.Singular;
 import lombok.Value;
 
 public sealed interface AuthorisePaymentResponse {
