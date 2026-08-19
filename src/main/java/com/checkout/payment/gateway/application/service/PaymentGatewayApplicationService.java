@@ -29,6 +29,8 @@ public class PaymentGatewayApplicationService {
   }
 
   public Payment createPayment(AuthorisePaymentRequest request) {
-    return paymentService.create(request);
+    Payment payment = paymentService.create(request);
+    paymentsRepository.store(payment);
+    return payment;
   }
 }

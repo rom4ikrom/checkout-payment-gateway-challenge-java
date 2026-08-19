@@ -1,4 +1,4 @@
-package com.checkout.payment.gateway.controller;
+package com.checkout.payment.gateway.integration;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,6 +16,7 @@ import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
 import com.checkout.payment.gateway.presentation.model.PostPaymentRequest;
 import java.math.BigDecimal;
 import java.util.UUID;
+import com.jayway.jsonpath.JsonPath;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -24,12 +25,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class PaymentGatewayControllerTest {
+class PaymentGatewayIntegrationTest {
 
   @Autowired
   private MockMvc mvc;
@@ -83,14 +85,23 @@ class PaymentGatewayControllerTest {
         .build();
 
     // expect
-    mvc.perform(MockMvcRequestBuilders
+    MvcResult result = mvc.perform(MockMvcRequestBuilders
         .post("/payments")
         .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())        .andExpect(jsonPath("$.status").value("authorized"))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").isString())
+        .andExpect(jsonPath("$.status").value("authorized"))
         .andExpect(jsonPath("$.cardNumberLastFour").value(1111))
         .andExpect(jsonPath("$.expiryMonth").value(9))
         .andExpect(jsonPath("$.expiryYear").value(2026))
         .andExpect(jsonPath("$.currency").value("GBP"))
-        .andExpect(jsonPath("$.amount").value(4201));
+        .andExpect(jsonPath("$.amount").value(4201))
+        .andReturn();
+
+    // and
+    String paymentId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+    mvc.perform(MockMvcRequestBuilders.get("/payments/" + paymentId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(paymentId));
   }
 }
