@@ -111,7 +111,6 @@ class PaymentFactoryTest {
   @NullSource
   @EmptySource
   void throwsExceptionIfStrategiesAreMissing(List<PaymentStrategy> strategies) {
-    // expect
     assertThatThrownBy(() -> new PaymentFactory(strategies))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("No payment strategies were found.");
