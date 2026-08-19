@@ -1,4 +1,4 @@
-package com.checkout.payment.gateway.model;
+package com.checkout.payment.gateway.presentation.model;
 
 import lombok.Builder;
 
