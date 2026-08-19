@@ -25,8 +25,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.46'
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
 
+    implementation 'org.joda:joda-money:2.0.3'
+    implementation 'com.google.guava:guava:33.6.0-jre'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test:4.1.0'
+
+    testImplementation 'org.assertj:assertj-core:3.27.7'
 }
 
 tasks.named('test') {

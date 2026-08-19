@@ -3,7 +3,7 @@ package com.checkout.payment.gateway.controller;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.checkout.payment.gateway.domain.model.PaymentStatus;
+import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
 import com.checkout.payment.gateway.infrastructure.repository.InMemoryPaymentsRepository;
 import com.checkout.payment.gateway.presentation.model.PostPaymentResponse;
 import java.util.UUID;
@@ -39,7 +39,7 @@ class PaymentGatewayControllerTest {
 
     mvc.perform(MockMvcRequestBuilders.get("/payment/" + payment.id()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value(payment.status().getName()))
+        .andExpect(jsonPath("$.status").value(payment.status().name()))
         .andExpect(jsonPath("$.cardNumberLastFour").value(payment.cardNumberLastFour()))
         .andExpect(jsonPath("$.expiryMonth").value(payment.expiryMonth()))
         .andExpect(jsonPath("$.expiryYear").value(payment.expiryYear()))

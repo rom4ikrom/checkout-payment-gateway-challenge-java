@@ -1,9 +1,9 @@
 package com.checkout.payment.gateway.application.service;
 
 import com.checkout.payment.gateway.domain.exception.EventProcessingException;
+import com.checkout.payment.gateway.infrastructure.repository.InMemoryPaymentsRepository;
 import com.checkout.payment.gateway.presentation.model.PostPaymentRequest;
 import com.checkout.payment.gateway.presentation.model.PostPaymentResponse;
-import com.checkout.payment.gateway.infrastructure.repository.InMemoryPaymentsRepository;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
