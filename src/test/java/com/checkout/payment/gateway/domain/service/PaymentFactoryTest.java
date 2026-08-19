@@ -75,7 +75,7 @@ class PaymentFactoryTest {
   void createsDeclinedPayment() {
     // given
     var request = validAuthorisePaymentRequest();
-    var response = new AuthorisePaymentResponse.Declined();
+    var response = AuthorisePaymentResponse.Declined.instance();
     var paymentId = "b8c464fe-7d2b-4c6e-90ee-27c15507a287";
     when(paymentIdGenerator.nextId()).thenReturn(PaymentId.of(paymentId));
 
@@ -99,7 +99,7 @@ class PaymentFactoryTest {
   void throwsExceptionIfRejectedAuthorisation() {
     // given
     var request = validAuthorisePaymentRequest();
-    var response = new AuthorisePaymentResponse.Rejected();
+    var response = AuthorisePaymentResponse.Rejected.instance();
 
     // expect
     assertThatThrownBy(() -> underTest.create(request, response))

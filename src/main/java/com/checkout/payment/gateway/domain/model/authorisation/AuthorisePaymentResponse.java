@@ -14,9 +14,25 @@ public sealed interface AuthorisePaymentResponse {
 
   final class Declined implements AuthorisePaymentResponse {
 
+    private static final Declined INSTANCE = new Declined();
+
+    private Declined() {}
+
+    public static Declined instance() {
+      return INSTANCE;
+    }
+
   }
 
   final class Rejected implements AuthorisePaymentResponse {
+
+    private static final Rejected INSTANCE = new Rejected();
+
+    private Rejected() {}
+
+    public static Rejected instance() {
+      return INSTANCE;
+    }
 
   }
 
