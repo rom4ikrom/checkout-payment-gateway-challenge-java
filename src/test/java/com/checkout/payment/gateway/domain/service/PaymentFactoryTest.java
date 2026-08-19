@@ -17,6 +17,9 @@ import org.joda.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
@@ -104,7 +107,15 @@ class PaymentFactoryTest {
         .hasMessage("Failed to authorise payment, authorisation rejected. Please try again later or use different card.");
   }
 
-
+  @ParameterizedTest
+  @NullSource
+  @EmptySource
+  void throwsExceptionIfStrategiesAreMissing(List<PaymentStrategy> strategies) {
+    // expect
+    assertThatThrownBy(() -> new PaymentFactory(strategies))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessage("No payment strategies were found.");
+  }
 
 
 }

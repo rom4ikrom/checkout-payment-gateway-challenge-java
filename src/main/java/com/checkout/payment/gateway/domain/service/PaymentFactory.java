@@ -5,15 +5,18 @@ import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentR
 import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentResponse;
 import com.checkout.payment.gateway.domain.model.payment.Payment;
 import com.google.common.collect.MoreCollectors;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import java.util.List;
 
-@RequiredArgsConstructor
 public class PaymentFactory {
 
-  @NonNull
   private final List<PaymentStrategy> strategies;
+
+  public PaymentFactory(List<PaymentStrategy> strategies) {
+    if (strategies == null || strategies.isEmpty()) {
+      throw new IllegalArgumentException("No payment strategies were found.");
+    }
+    this.strategies = strategies;
+  }
 
   public Payment create(AuthorisePaymentRequest request, AuthorisePaymentResponse response) {
     return strategies.stream()
