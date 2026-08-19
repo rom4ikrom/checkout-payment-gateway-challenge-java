@@ -4,8 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record PostPaymentRequest(
-    // TODO: change to full card number according to task description
-    int cardNumberLastFour,
+    String cardNumber,
     int expiryMonth,
     int expiryYear,
     String currency,

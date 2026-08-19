@@ -12,7 +12,8 @@ import com.checkout.payment.gateway.domain.model.values.ExpiryDate;
 import com.checkout.payment.gateway.domain.model.values.ExpiryMonth;
 import com.checkout.payment.gateway.domain.model.values.ExpiryYear;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
-import com.checkout.payment.gateway.infrastructure.repository.InMemoryPaymentsRepository;
+import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
+import com.checkout.payment.gateway.presentation.model.PostPaymentRequest;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.joda.money.CurrencyUnit;
@@ -21,8 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,7 +34,9 @@ class PaymentGatewayControllerTest {
   @Autowired
   private MockMvc mvc;
   @Autowired
-  InMemoryPaymentsRepository paymentsRepository;
+  private PaymentsRepository paymentsRepository;
+  @Autowired
+  private JsonMapper objectMapper;
 
   @Test
   void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {
@@ -48,7 +53,7 @@ class PaymentGatewayControllerTest {
     paymentsRepository.store(payment);
 
     // expect
-    mvc.perform(MockMvcRequestBuilders.get("/payment/" + payment.id()))
+    mvc.perform(MockMvcRequestBuilders.get("/payments/" + payment.id()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("authorized"))
         .andExpect(jsonPath("$.cardNumberLastFour").value(1111))
@@ -60,8 +65,32 @@ class PaymentGatewayControllerTest {
 
   @Test
   void whenPaymentWithIdDoesNotExistThen404IsReturned() throws Exception {
-    mvc.perform(MockMvcRequestBuilders.get("/payment/" + UUID.randomUUID()))
+    mvc.perform(MockMvcRequestBuilders.get("/payments/" + UUID.randomUUID()))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.message").value("Page not found"));
+  }
+
+  @Test
+  void createsPayment() throws Exception {
+    // given
+    var request = PostPaymentRequest.builder()
+        .cardNumber("4444333322221111")
+        .expiryMonth(9)
+        .expiryYear(2026)
+        .cvv(123)
+        .currency("GBP")
+        .amount(4201)
+        .build();
+
+    // expect
+    mvc.perform(MockMvcRequestBuilders
+        .post("/payments")
+        .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isCreated())        .andExpect(jsonPath("$.status").value("authorized"))
+        .andExpect(jsonPath("$.cardNumberLastFour").value(1111))
+        .andExpect(jsonPath("$.expiryMonth").value(9))
+        .andExpect(jsonPath("$.expiryYear").value(2026))
+        .andExpect(jsonPath("$.currency").value("GBP"))
+        .andExpect(jsonPath("$.amount").value(4201));
   }
 }

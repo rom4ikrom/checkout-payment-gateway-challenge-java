@@ -4,10 +4,8 @@ import com.checkout.payment.gateway.domain.model.payment.Payment;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
 import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
 import com.checkout.payment.gateway.infrastructure.entity.PaymentEntity;
-import com.checkout.payment.gateway.presentation.model.PostPaymentResponse;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository

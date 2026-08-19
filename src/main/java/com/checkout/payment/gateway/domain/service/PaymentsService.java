@@ -13,7 +13,7 @@ import java.time.Clock;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class PaymentService {
+public class PaymentsService {
 
   private static final Set<CurrencyUnit> ACCEPTABLE_CURRENCIES = Set.of(
       CurrencyUnit.GBP,

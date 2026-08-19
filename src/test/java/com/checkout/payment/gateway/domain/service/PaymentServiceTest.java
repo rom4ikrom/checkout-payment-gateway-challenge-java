@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import com.checkout.payment.gateway.domain.api.AuthorisationApi;
 import com.checkout.payment.gateway.domain.exception.PastYearMonthException;
 import com.checkout.payment.gateway.domain.exception.UnsupportedCurrencyException;
-import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentRequest;
 import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentResponse;
 import com.checkout.payment.gateway.domain.model.payment.CardDetails;
 import com.checkout.payment.gateway.domain.model.payment.Payment;
@@ -41,7 +40,7 @@ class PaymentServiceTest {
       Instant.parse("2026-08-19T16:13:01Z"),
       ZoneOffset.UTC);
 
-  private PaymentService underTest;
+  private PaymentsService underTest;
 
   @Mock
   private AuthorisationApi authorisationApi;
@@ -50,7 +49,7 @@ class PaymentServiceTest {
 
   @BeforeEach
   void setup() {
-    underTest = new PaymentService(CLOCK, authorisationApi, paymentFactory);
+    underTest = new PaymentsService(CLOCK, authorisationApi, paymentFactory);
   }
 
   @Test
