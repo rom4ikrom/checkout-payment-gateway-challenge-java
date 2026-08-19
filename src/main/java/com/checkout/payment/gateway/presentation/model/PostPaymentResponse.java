@@ -1,6 +1,6 @@
 package com.checkout.payment.gateway.presentation.model;
 
-import com.checkout.payment.gateway.domain.model.PaymentStatus;
+import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
 import lombok.Builder;
 import java.util.UUID;
 
