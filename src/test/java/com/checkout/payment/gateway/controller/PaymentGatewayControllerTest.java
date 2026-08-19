@@ -1,19 +1,17 @@
 package com.checkout.payment.gateway.controller;
 
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.checkout.payment.gateway.enums.PaymentStatus;
-import com.checkout.payment.gateway.model.PostPaymentResponse;
-import com.checkout.payment.gateway.repository.PaymentsRepository;
+import com.checkout.payment.gateway.domain.model.PaymentStatus;
+import com.checkout.payment.gateway.infrastructure.repository.InMemoryPaymentsRepository;
+import com.checkout.payment.gateway.presentation.model.PostPaymentResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
-
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @SpringBootTest
@@ -23,7 +21,7 @@ class PaymentGatewayControllerTest {
   @Autowired
   private MockMvc mvc;
   @Autowired
-  PaymentsRepository paymentsRepository;
+  InMemoryPaymentsRepository paymentsRepository;
 
   @Test
   void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {

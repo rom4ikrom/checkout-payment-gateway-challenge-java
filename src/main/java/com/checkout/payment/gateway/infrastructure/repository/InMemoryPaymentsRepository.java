@@ -1,13 +1,14 @@
-package com.checkout.payment.gateway.repository;
+package com.checkout.payment.gateway.infrastructure.repository;
 
-import com.checkout.payment.gateway.model.PostPaymentResponse;
+import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
+import com.checkout.payment.gateway.presentation.model.PostPaymentResponse;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PaymentsRepository {
+public class InMemoryPaymentsRepository implements PaymentsRepository {
 
   private final HashMap<UUID, PostPaymentResponse> payments = new HashMap<>();
 
