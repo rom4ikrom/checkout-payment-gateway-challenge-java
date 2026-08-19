@@ -1,8 +1,6 @@
 package com.checkout.payment.gateway.domain.model.payment;
 
 import com.checkout.payment.gateway.domain.model.values.AuthorisationCode;
-import com.checkout.payment.gateway.domain.model.values.CardNumberLastFour;
-import com.checkout.payment.gateway.domain.model.values.ExpiryDate;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
 import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
@@ -19,11 +17,9 @@ public class Payment {
   @NonNull
   PaymentId id;
   @NonNull
+  CardDetails cardDetails;
+  @NonNull
   PaymentStatus status;
-  @NonNull
-  CardNumberLastFour lastFourCardDigits;
-  @NonNull
-  ExpiryDate expiryDate;
   @NonNull
   Money amount;
 

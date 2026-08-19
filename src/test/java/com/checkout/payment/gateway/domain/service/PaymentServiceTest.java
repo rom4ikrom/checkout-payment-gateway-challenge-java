@@ -1,5 +1,6 @@
 package com.checkout.payment.gateway.domain.service;
 
+import static com.checkout.payment.gateway.domain.utils.TestFixtures.validAuthorisePaymentRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -8,11 +9,13 @@ import com.checkout.payment.gateway.domain.api.AuthorisationApi;
 import com.checkout.payment.gateway.domain.exception.PastYearMonthException;
 import com.checkout.payment.gateway.domain.exception.UnsupportedCurrencyException;
 import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentRequest;
+import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentResponse;
+import com.checkout.payment.gateway.domain.model.payment.CardDetails;
 import com.checkout.payment.gateway.domain.model.payment.Payment;
 import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
+import com.checkout.payment.gateway.domain.model.values.AuthorisationCode;
 import com.checkout.payment.gateway.domain.model.values.CardCvv;
 import com.checkout.payment.gateway.domain.model.values.CardNumber;
-import com.checkout.payment.gateway.domain.model.values.CardNumberLastFour;
 import com.checkout.payment.gateway.domain.model.values.ExpiryDate;
 import com.checkout.payment.gateway.domain.model.values.ExpiryMonth;
 import com.checkout.payment.gateway.domain.model.values.ExpiryYear;
@@ -41,44 +44,50 @@ class PaymentServiceTest {
   private PaymentService underTest;
 
   @Mock
-  private PaymentIdGenerator paymentIdGenerator;
-  @Mock
   private AuthorisationApi authorisationApi;
+  @Mock
+  private PaymentFactory paymentFactory;
 
   @BeforeEach
   void setup() {
-    underTest = new PaymentService(paymentIdGenerator, authorisationApi, CLOCK);
+    underTest = new PaymentService(CLOCK, authorisationApi, paymentFactory);
   }
 
   @Test
-  void returnsAuthorisedPayment() {
+  void returnsPayment() {
     // given
-    var paymentId = PaymentId.of("ede16a47-8709-4b55-8dac-b69f084c4ef2");
-    when(paymentIdGenerator.nextId()).thenReturn(paymentId);
+    var request = validAuthorisePaymentRequest();
+    var response = new AuthorisePaymentResponse.Authorised(
+        AuthorisationCode.of("617fcef2-c7c1-4c7d-b0ff-ff5eadc23cd6"));
+    when(authorisationApi.authorisePayment(request)).thenReturn(response);
+
+    // and
+    var payment = Payment.builder()
+        .id(PaymentId.of("cc837a9b-e493-4ceb-a752-7f5aba8e1d86"))
+        .cardDetails(new CardDetails(
+            CardNumber.of("4444333322221111"),
+            new ExpiryDate(ExpiryMonth.of(9), ExpiryYear.of(2026)),
+            CardCvv.of("123")))
+        .status(PaymentStatus.AUTHORIZED)
+        .amount(Money.of(CurrencyUnit.GBP, new BigDecimal("42.01")))
+        .build();
+    when(paymentFactory.create(request, response)).thenReturn(payment);
 
     // when
-    var result = underTest.create(validRequest());
+    var result = underTest.create(request);
 
     // then
-    assertThat(result).isEqualTo(
-        Payment.builder()
-            .id(paymentId)
-            .status(PaymentStatus.AUTHORIZED)
-            .lastFourCardDigits(CardNumberLastFour.of("1234"))
-            .expiryDate(new ExpiryDate(ExpiryMonth.of(8), ExpiryYear.of(2026)))
-            .amount(Money.of(CurrencyUnit.GBP, new BigDecimal("42.01")))
-            .build()
-    );
+    assertThat(result).isEqualTo(payment);
   }
 
   @Test
   void throwsExceptionIfCurrencyIsNotSupported() {
     // given
-    var request = validRequest().toBuilder()
+    var request = validAuthorisePaymentRequest().toBuilder()
         .currency(CurrencyUnit.of("UAH"))
         .build();
 
-    // when and then
+    // expect
     assertThatThrownBy(() -> underTest.create(request))
         .isInstanceOf(UnsupportedCurrencyException.class)
         .hasMessage("Currency UAH is not supported.");
@@ -88,24 +97,14 @@ class PaymentServiceTest {
   @ValueSource(ints = {7, 8})
   void throwsExceptionIfExpiryDateIsNotInTheFuture(int month) {
     // given
-    var request = validRequest().toBuilder()
+    var request = validAuthorisePaymentRequest().toBuilder()
         .expiryDate(new ExpiryDate(ExpiryMonth.of(month), ExpiryYear.of(2026)))
         .build();
 
-    // when and then
+    // expect
     assertThatThrownBy(() -> underTest.create(request))
         .isInstanceOf(PastYearMonthException.class)
         .hasMessage("Month and year must be in the future.");
-  }
-
-  private static AuthorisePaymentRequest validRequest() {
-    return AuthorisePaymentRequest.builder()
-        .cardNumber(CardNumber.of("4444333322221111"))
-        .expiryDate(new ExpiryDate(ExpiryMonth.of(9), ExpiryYear.of(2026)))
-        .cardCvv(CardCvv.of("123"))
-        .currency(CurrencyUnit.GBP)
-        .amount(4201)
-        .build();
   }
 
 }
