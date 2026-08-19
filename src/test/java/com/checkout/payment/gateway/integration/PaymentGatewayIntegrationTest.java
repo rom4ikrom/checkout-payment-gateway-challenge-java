@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.UUID;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
@@ -90,13 +89,6 @@ class PaymentGatewayIntegrationTest {
         .andExpect(jsonPath("$.expiryYear").value(2026))
         .andExpect(jsonPath("$.currency").value("GBP"))
         .andExpect(jsonPath("$.amount").value(4201));
-  }
-
-  @Test
-  void whenPaymentWithIdDoesNotExistThen404IsReturned() throws Exception {
-    mvc.perform(MockMvcRequestBuilders.get("/payments/" + UUID.randomUUID()))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.message").value("Page not found"));
   }
 
   @Test

@@ -1,6 +1,6 @@
 package com.checkout.payment.gateway.application.service;
 
-import com.checkout.payment.gateway.domain.exception.EventProcessingException;
+import com.checkout.payment.gateway.domain.exception.PaymentNotFoundException;
 import com.checkout.payment.gateway.domain.model.authorisation.AuthorisePaymentRequest;
 import com.checkout.payment.gateway.domain.model.payment.Payment;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
@@ -25,7 +25,7 @@ public class PaymentGatewayApplicationService {
 
   public Payment getPaymentById(PaymentId id) {
     LOG.debug("Requesting access to to payment with ID {}", id);
-    return paymentsRepository.maybePayment(id).orElseThrow(() -> new EventProcessingException("Invalid ID"));
+    return paymentsRepository.maybePayment(id).orElseThrow(() -> new PaymentNotFoundException(id));
   }
 
   public Payment createPayment(AuthorisePaymentRequest request) {
