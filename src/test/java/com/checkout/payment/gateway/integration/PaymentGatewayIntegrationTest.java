@@ -13,8 +13,12 @@ import com.checkout.payment.gateway.domain.model.values.ExpiryMonth;
 import com.checkout.payment.gateway.domain.model.values.ExpiryYear;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
 import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
+import com.checkout.payment.gateway.integration.PaymentGatewayIntegrationTest.TestApplicationConfiguration;
 import com.checkout.payment.gateway.presentation.model.PostPaymentRequest;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.UUID;
 import com.jayway.jsonpath.JsonPath;
 import org.joda.money.CurrencyUnit;
@@ -22,15 +26,22 @@ import org.joda.money.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.json.JsonMapper;
 
-@SpringBootTest
+@SpringBootTest(
+    properties = "spring.main.allow-bean-definition-overriding=true"
+)
 @AutoConfigureMockMvc
+@Import(TestApplicationConfiguration.class)
 class PaymentGatewayIntegrationTest {
 
   @Autowired
@@ -103,5 +114,16 @@ class PaymentGatewayIntegrationTest {
     mvc.perform(MockMvcRequestBuilders.get("/payments/" + paymentId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(paymentId));
+  }
+
+  @TestConfiguration
+  static class TestApplicationConfiguration {
+
+    @Bean
+    @Primary
+    public Clock clock() {
+      return Clock.fixed(Instant.parse("2026-08-19T19:22:01Z"), ZoneOffset.UTC);
+    }
+
   }
 }
