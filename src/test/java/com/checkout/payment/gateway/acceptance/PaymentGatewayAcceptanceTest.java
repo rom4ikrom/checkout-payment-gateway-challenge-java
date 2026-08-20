@@ -1,28 +1,16 @@
-package com.checkout.payment.gateway.integration;
+package com.checkout.payment.gateway.acceptance;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.checkout.payment.gateway.domain.model.payment.CardDetails;
-import com.checkout.payment.gateway.domain.model.payment.Payment;
-import com.checkout.payment.gateway.domain.model.payment.PaymentStatus;
-import com.checkout.payment.gateway.domain.model.values.CardCvv;
-import com.checkout.payment.gateway.domain.model.values.CardNumber;
-import com.checkout.payment.gateway.domain.model.values.ExpiryDate;
-import com.checkout.payment.gateway.domain.model.values.ExpiryMonth;
-import com.checkout.payment.gateway.domain.model.values.ExpiryYear;
-import com.checkout.payment.gateway.domain.model.values.PaymentId;
-import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
-import com.checkout.payment.gateway.integration.PaymentGatewayIntegrationTest.TestApplicationConfiguration;
+import com.checkout.payment.gateway.acceptance.PaymentGatewayAcceptanceTest.TestApplicationConfiguration;
 import com.checkout.payment.gateway.presentation.model.PostPaymentRequest;
 import com.jayway.jsonpath.JsonPath;
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -46,12 +34,10 @@ import tools.jackson.databind.json.JsonMapper;
 @AutoConfigureMockMvc
 @Import(TestApplicationConfiguration.class)
 @Testcontainers
-class PaymentGatewayIntegrationTest {
+class PaymentGatewayAcceptanceTest {
 
   @Autowired
-  private MockMvc mvc;
-  @Autowired
-  private PaymentsRepository paymentsRepository;
+  private MockMvc mockMvc;
   @Autowired
   private JsonMapper objectMapper;
 
@@ -66,36 +52,15 @@ class PaymentGatewayIntegrationTest {
     );
   }
 
-  @Test
-  void whenPaymentWithIdExistThenCorrectPaymentIsReturned() throws Exception {
-    // given
-    var payment = Payment.builder()
-        .id(PaymentId.of("cc837a9b-e493-4ceb-a752-7f5aba8e1d86"))
-        .cardDetails(new CardDetails(
-            CardNumber.of("4444333322221111"),
-            new ExpiryDate(ExpiryMonth.of(9), ExpiryYear.of(2026)),
-            CardCvv.of("123")))
-        .status(PaymentStatus.AUTHORIZED)
-        .amount(Money.of(CurrencyUnit.GBP, new BigDecimal("42.01")))
-        .build();
-    paymentsRepository.store(payment);
-
-    // expect
-    mvc.perform(MockMvcRequestBuilders.get("/payments/" + payment.id()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("authorized"))
-        .andExpect(jsonPath("$.cardNumberLastFour").value(1111))
-        .andExpect(jsonPath("$.expiryMonth").value(9))
-        .andExpect(jsonPath("$.expiryYear").value(2026))
-        .andExpect(jsonPath("$.currency").value("GBP"))
-        .andExpect(jsonPath("$.amount").value(4201));
-  }
-
-  @Test
-  void createsPayment() throws Exception {
+  @ParameterizedTest(quoteTextArguments = false)
+  @CsvSource({
+      "4444333322221111,1111,Authorized",
+      "4444333322221112,1112,Declined"
+  })
+  void createsAndRetrievesPayment(String cardNumber, String expectedLastFour, String expectedStatus) throws Exception {
     // given
     var request = PostPaymentRequest.builder()
-        .cardNumber("4444333322221111")
+        .cardNumber(cardNumber)
         .expiryMonth(9)
         .expiryYear(2026)
         .cvv(123)
@@ -104,13 +69,13 @@ class PaymentGatewayIntegrationTest {
         .build();
 
     // expect
-    MvcResult result = mvc.perform(MockMvcRequestBuilders
+    MvcResult result = mockMvc.perform(MockMvcRequestBuilders
         .post("/payments")
         .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").isString())
-        .andExpect(jsonPath("$.status").value("authorized"))
-        .andExpect(jsonPath("$.cardNumberLastFour").value(1111))
+        .andExpect(jsonPath("$.status").value(expectedStatus))
+        .andExpect(jsonPath("$.cardNumberLastFour").value(expectedLastFour))
         .andExpect(jsonPath("$.expiryMonth").value(9))
         .andExpect(jsonPath("$.expiryYear").value(2026))
         .andExpect(jsonPath("$.currency").value("GBP"))
@@ -119,9 +84,15 @@ class PaymentGatewayIntegrationTest {
 
     // and
     String paymentId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
-    mvc.perform(MockMvcRequestBuilders.get("/payments/" + paymentId))
+    mockMvc.perform(MockMvcRequestBuilders.get("/payments/" + paymentId))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(paymentId));
+        .andExpect(jsonPath("$.id").value(paymentId))
+        .andExpect(jsonPath("$.status").value(expectedStatus))
+        .andExpect(jsonPath("$.cardNumberLastFour").value(expectedLastFour))
+        .andExpect(jsonPath("$.expiryMonth").value(9))
+        .andExpect(jsonPath("$.expiryYear").value(2026))
+        .andExpect(jsonPath("$.currency").value("GBP"))
+        .andExpect(jsonPath("$.amount").value(4201));
   }
 
   @TestConfiguration
