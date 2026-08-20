@@ -18,7 +18,7 @@ public class PaymentFactory {
     this.strategies = strategies;
   }
 
-  public Payment create(AuthorisePaymentRequest request, AuthorisePaymentResponse response) {
+  Payment create(AuthorisePaymentRequest request, AuthorisePaymentResponse response) {
     return strategies.stream()
         .filter(strategy -> strategy.supports(response))
         .collect(MoreCollectors.toOptional())

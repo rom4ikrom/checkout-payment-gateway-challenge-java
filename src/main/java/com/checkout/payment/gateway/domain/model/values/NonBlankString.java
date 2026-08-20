@@ -3,7 +3,7 @@ package com.checkout.payment.gateway.domain.model.values;
 import org.apache.commons.lang3.StringUtils;
 import java.util.Objects;
 
-abstract class NonBlankString {
+public abstract class NonBlankString {
 
   private final String value;
 

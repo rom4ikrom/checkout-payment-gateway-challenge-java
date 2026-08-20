@@ -1,4 +1,4 @@
-package com.checkout.payment.gateway.integration;
+package com.checkout.payment.gateway.acceptance;
 
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;

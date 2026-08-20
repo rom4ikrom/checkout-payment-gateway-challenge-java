@@ -27,6 +27,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
 
     implementation 'org.joda:joda-money:2.0.3'
+    implementation 'tools.jackson.datatype:jackson-datatype-joda-money:3.2.2'
     implementation 'com.google.guava:guava:33.6.0-jre'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
