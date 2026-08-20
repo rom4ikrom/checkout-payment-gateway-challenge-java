@@ -8,15 +8,11 @@ import com.checkout.payment.gateway.domain.repository.PaymentsRepository;
 import com.checkout.payment.gateway.domain.service.PaymentsService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentGatewayApplicationService {
-
-  private static final Logger LOG = LoggerFactory.getLogger(PaymentGatewayApplicationService.class);
 
   @NonNull
   private final PaymentsRepository paymentsRepository;
@@ -24,7 +20,6 @@ public class PaymentGatewayApplicationService {
   private final PaymentsService paymentService;
 
   public Payment getPaymentById(PaymentId id) {
-    LOG.debug("Requesting access to to payment with ID {}", id);
     return paymentsRepository.maybePayment(id).orElseThrow(() -> new PaymentNotFoundException(id));
   }
 
