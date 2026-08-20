@@ -20,7 +20,6 @@ import com.checkout.payment.gateway.domain.model.values.ExpiryDate;
 import com.checkout.payment.gateway.domain.model.values.ExpiryMonth;
 import com.checkout.payment.gateway.domain.model.values.ExpiryYear;
 import com.checkout.payment.gateway.domain.model.values.PaymentId;
-import com.checkout.payment.gateway.domain.utils.TestFixtures;
 import com.checkout.payment.gateway.infrastructure.configuration.JacksonConfiguration;
 import com.checkout.payment.gateway.presentation.model.PostPaymentRequest;
 import java.math.BigDecimal;
